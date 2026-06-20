@@ -1,0 +1,31 @@
+services:
+
+  # Servicio 1: la base de datos PostgreSQL
+  db:
+    image: postgres:16
+    container_name: postgres-blueprints
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: blueprintsdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - blueprints-data:/var/lib/postgresql/data
+
+  # Servicio 2: tu aplicación Spring Boot
+  app:
+    build: .
+    container_name: blueprints-app
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/blueprintsdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+# Volumen para que los datos de PostgreSQL no se pierdan al reiniciar
+volumes:
+  blueprints-data:
